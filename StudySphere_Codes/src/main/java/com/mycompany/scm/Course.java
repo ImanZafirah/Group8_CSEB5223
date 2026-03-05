@@ -4,16 +4,16 @@ public class Course {
     
     private String courseName;
     private String courseCode;
-    private int credHour;
-    private String courseSum;
+    private int creditHour ;
+    private String summary;
     private String teamsLink;
 
-    public Course (String courseName, String courseCode, int credHour, String courseSum, String teamsLink)
+    public Course (String courseName, String courseCode, int creditHour , String summary, String teamsLink)
     {
         this.courseName = courseName;
         this.courseCode = courseCode;
-        this.credHour = credHour;
-        this.courseSum = courseSum;
+        this.creditHour  = creditHour;
+        this.summary = summary;
         this.teamsLink = teamsLink;
     }
 
@@ -39,24 +39,24 @@ public class Course {
         this.courseCode = courseCode;
     }
 
-    public int getCredHour()
+    public int getCreditHour()
     {
-        return credHour;
+        return creditHour ;
     }
 
-    public void setCredHour(int credHour)
+    public void setCreditHour (int creditHour )
     {
-        this.credHour = credHour;
+        this.creditHour  = creditHour ;
     }
 
-    public String getCourseSum()
+    public String getSummary()
     {
-        return courseSum;
+        return summary;
     }
 
-    public void setCourseSum(String courseSum)
+    public void setSummary(String summary)
     {
-        this.courseSum = courseSum;
+        this.summary = summary;
     }
 
     public String getTeamsLink()
