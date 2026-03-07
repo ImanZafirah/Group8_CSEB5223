@@ -1,4 +1,4 @@
-package com.mycompany.scm;
+package com.mycompany.slms;
 
 public class Course {
     

@@ -2,15 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package com.mycompany.scm;
+package com.mycompany.slms;
 
 /**
  *
  * @author user
  */
-public class SCM {
+public class SLMS {
+
     public static void main(String[] args) {
-        CourseManager manager = new CourseManager();
-        manager.addCourseWithPopup(); 
+        //CourseManager manager = new CourseManager();
+        CourseManager.main(args);
     }
 }

@@ -1,8 +1,8 @@
-package com.mycompany.scm;
+package com.mycompany.slms;
 
 import java.util.Scanner;
 
-public class CourseProfileApp {
+public class CourseManager {
 
     static Course[] courses = new Course[100];
     static int count = 0;
