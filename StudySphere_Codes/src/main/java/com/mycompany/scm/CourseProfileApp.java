@@ -17,7 +17,8 @@ public class CourseProfileApp {
             System.out.println("1. Add Course");
             System.out.println("2. Search Course");
             System.out.println("3. Edit Course");
-            System.out.println("4. Exit");
+            System.out.println("4. Delete Course");
+            System.out.println("5. Exit");
             System.out.print("Choose option: ");
 
             choice = scanner.nextInt();
@@ -38,6 +39,10 @@ public class CourseProfileApp {
                     break;
 
                 case 4:
+                    deleteCourse(scanner);
+                    break;
+
+                case 5:
                     System.out.println("Exiting...");
                     break;
 
@@ -106,7 +111,9 @@ public class CourseProfileApp {
             System.out.println("Course not found.");
         }
     }
+
     public static void editCourse(Scanner scanner) {
+
     System.out.print("Enter Course Code to edit: ");
     String searchCode = scanner.nextLine();
 
@@ -166,6 +173,70 @@ public class CourseProfileApp {
 
     if (!found) {
         System.out.println("Course not found.");
+    }
+}
+
+    public static void deleteCourse(Scanner scanner) {
+
+        System.out.print("Enter Course Code to delete: ");
+        String code = scanner.nextLine();
+
+        boolean found = false;
+
+        for (int i = 0; i < count; i++) {
+
+            if (courses[i].getCourseCode().equalsIgnoreCase(code)) {
+
+                System.out.println("\nCourse Found:");
+                System.out.println("Course Name   : " + courses[i].getCourseName());
+                System.out.println("Course Code   : " + courses[i].getCourseCode());
+                System.out.println("Credit Hour   : " + courses[i].getCreditHour());
+                System.out.println("Summary       : " + courses[i].getSummary());
+                System.out.println("MS Teams Link : " + courses[i].getTeamsLink());
+
+                System.out.print("\nConfirm deletion? (Y/N): ");
+                String confirm = scanner.nextLine();
+
+                if (confirm.equalsIgnoreCase("Y")) {
+
+                    for (int j = i; j < count - 1; j++) {
+                        courses[j] = courses[j + 1];
+                    }
+
+                    courses[count - 1] = null;
+                    count--;
+
+                    System.out.println("Course deleted successfully!");
+                    displayCourses();
+                }
+
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Course not found.");
+        }
+    }
+
+    public static void displayCourses() {
+
+    if (count == 0) {
+        System.out.println("No courses available.");
+        return;
+    }
+
+    System.out.println("\n===== COURSE LIST =====");
+
+    for (int i = 0; i < count; i++) {
+
+        System.out.println("\nCourse " + (i + 1));
+        System.out.println("Course Name   : " + courses[i].getCourseName());
+        System.out.println("Course Code   : " + courses[i].getCourseCode());
+        System.out.println("Credit Hour   : " + courses[i].getCreditHour());
+        System.out.println("Summary       : " + courses[i].getSummary());
+        System.out.println("MS Teams Link : " + courses[i].getTeamsLink());
     }
 }
 }
