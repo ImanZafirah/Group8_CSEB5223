@@ -18,7 +18,8 @@ public class CourseProfileApp {
             System.out.println("2. Search Course");
             System.out.println("3. Edit Course");
             System.out.println("4. Delete Course");
-            System.out.println("5. Exit");
+            System.out.println("5. View All Course");
+            System.out.println("6. Exit");
             System.out.print("Choose option: ");
 
             choice = scanner.nextInt();
@@ -43,6 +44,10 @@ public class CourseProfileApp {
                     break;
 
                 case 5:
+                    displayCourses();
+                    break;
+
+                case 6:
                     System.out.println("Exiting...");
                     break;
 
@@ -50,7 +55,7 @@ public class CourseProfileApp {
                     System.out.println("Invalid choice.");
             }
 
-        } while (choice != 3);
+        } while (choice != 6);
 
         scanner.close();
     }
@@ -109,6 +114,7 @@ public class CourseProfileApp {
 
         if (!found) {
             System.out.println("Course not found.");
+            displayCourses();
         }
     }
 
