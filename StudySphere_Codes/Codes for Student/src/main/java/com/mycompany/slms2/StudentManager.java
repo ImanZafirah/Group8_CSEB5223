@@ -5,7 +5,30 @@ import java.util.Scanner;
 public class StudentManager {
 
     static Student[] student = new Student[100];
+    int[][] enrollment;
     static int count = 0;
+
+    String[] cachedStudentSearch = new String[50];
+    int studentCacheIndex = 0;
+
+    //Student cache
+    void cacheStudentSearch(String studentId){
+    cachedStudentSearch[studentCacheIndex] = studentId;
+    studentCacheIndex++;
+    if(studentCacheIndex >= cachedStudentSearch.length){
+        studentCacheIndex = 0;
+    }
+
+    //Auto suggestion for student
+    /*public void suggestStudent(String input){
+        System.out.println("Suggestions:");
+        for(String s : cachedStudentSearch){
+            if(s != null && s.startsWith(input)){
+                System.out.println(" - " + s);
+            }
+        }
+    }*/
+}
 
     public static void main(String[] args) {
 
@@ -109,6 +132,16 @@ public class StudentManager {
         System.out.println("Student added successfully!");
     }
 
+    public void addStudent(int courseIndex, int studentIndex) {
+
+        if (enrollment[studentIndex][courseIndex] == 1) {
+            System.out.println("Already assigned");
+            return;
+        }
+
+        enrollment[studentIndex][courseIndex] = 1;
+    }
+
     public static void searchStudent(Scanner scanner) {
 
         System.out.print("Enter Student ID to search: ");
@@ -134,6 +167,15 @@ public class StudentManager {
         if (!found) {
             System.out.println("Student not found.");
             displayStudent();
+        }
+    }
+
+    void findStudent(int courseIndex){
+
+        for(int i=0;i<student.length;i++){
+            if(enrollment[i][courseIndex] == 1){
+                System.out.println(student[i].getFirstName() + " " + student[i].getLastName());
+            }
         }
     }
 
@@ -283,4 +325,15 @@ public class StudentManager {
         System.out.println("Student Phone Number  : " + student[i].getStudentPhone());
     }
 }
+
+void listStudents(int courseIndex){
+
+        System.out.println("Students in course:");
+
+        for(int i=0;i<student.length;i++){
+            if(enrollment[i][courseIndex] == 1){
+                System.out.println(student[i].getStudentId());
+            }
+        }
+    }
 }

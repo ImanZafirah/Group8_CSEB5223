@@ -5,7 +5,20 @@ import java.util.Scanner;
 public class CourseManager {
 
     static Course[] courses = new Course[100];
+    int[][] enrollment;
     static int count = 0;
+
+    String[] cachedCourseSearch = new String[50];
+    int courseCacheIndex = 0;
+
+    //Courses Cache
+    void cacheCourseSearch(String courseCode){
+    cachedCourseSearch[courseCacheIndex] = courseCode;
+    courseCacheIndex++;
+    if(courseCacheIndex >= cachedCourseSearch.length){
+        courseCacheIndex = 0;
+    }
+}
 
     public static void main(String[] args) {
 
@@ -19,6 +32,7 @@ public class CourseManager {
             System.out.println("3. Edit Course");
             System.out.println("4. Delete Course");
             System.out.println("5. View All Course");
+            //System.out.println("6. Manage Course"); //Core, Elective, University
             System.out.println("6. Exit");
             System.out.print("Choose option: ");
 
@@ -47,6 +61,10 @@ public class CourseManager {
                     displayCourses();
                     break;
 
+                /*case 6:
+                    manageCourses();
+                    break;
+*/
                 case 6:
                     System.out.println("Exiting...");
                     break;
@@ -83,10 +101,22 @@ public class CourseManager {
         System.out.print("MS Teams Link: ");
         String link = scanner.nextLine();
 
-        courses[count] = new Course(name, code, credit, summary, link);
+        System.out.print("Course Type: ");
+        String type = scanner.nextLine();
+
+        courses[count] = new Course(name, code, credit, summary, link, type);
         count++;
 
         System.out.println("Course added successfully!");
+    }
+
+    public void enrollStudentInCourse(int studentIndex, int courseIndex) {
+        if (enrollment[studentIndex][courseIndex] == 1) {
+            System.out.println("Student already enrolled");
+            return;
+        }
+        enrollment[studentIndex][courseIndex] = 1;
+        System.out.println("Course added to student");
     }
 
     public static void searchCourse(Scanner scanner) {
@@ -106,6 +136,7 @@ public class CourseManager {
                 System.out.println("Credit Hour    : " + courses[i].getCreditHour());
                 System.out.println("Summary        : " + courses[i].getSummary());
                 System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+                System.out.println("Course Type : " + courses[i].getCourseType());
 
                 found = true;
                 break;
@@ -115,6 +146,15 @@ public class CourseManager {
         if (!found) {
             System.out.println("Course not found.");
             displayCourses();
+        }
+    }
+
+    void findCourse(int studentIndex) {
+
+        for(int i=0; i<courses.length; i++) {
+            if(enrollment[studentIndex][i] == 1) {
+                System.out.println(courses[i].getCourseName());
+            }
         }
     }
 
@@ -133,6 +173,7 @@ public class CourseManager {
             System.out.println("Credit Hour    : " + courses[i].getCreditHour());
             System.out.println("Summary        : " + courses[i].getSummary());
             System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+            System.out.println("Course Type : " + courses[i].getCourseType());
 
             System.out.println("\nEnter new values (leave blank to keep current)");
 
@@ -171,6 +212,7 @@ public class CourseManager {
             System.out.println("Credit Hour    : " + courses[i].getCreditHour());
             System.out.println("Summary        : " + courses[i].getSummary());
             System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+            System.out.println("Course Type : " + courses[i].getCourseType());
 
             found = true;
             break;
@@ -199,6 +241,7 @@ public class CourseManager {
                 System.out.println("Credit Hour   : " + courses[i].getCreditHour());
                 System.out.println("Summary       : " + courses[i].getSummary());
                 System.out.println("MS Teams Link : " + courses[i].getTeamsLink());
+                System.out.println("Course Type : " + courses[i].getCourseType());
 
                 System.out.print("\nConfirm deletion? (Y/N): ");
                 String confirm = scanner.nextLine();
@@ -243,6 +286,18 @@ public class CourseManager {
         System.out.println("Credit Hour   : " + courses[i].getCreditHour());
         System.out.println("Summary       : " + courses[i].getSummary());
         System.out.println("MS Teams Link : " + courses[i].getTeamsLink());
+        System.out.println("Course Type : " + courses[i].getCourseType());
     }
 }
+
+void listCourses(int studentIndex){
+
+        System.out.println("Courses enrolled:");
+
+        for(int i=0;i<courses.length;i++){
+            if(enrollment[studentIndex][i] == 1){
+                System.out.println(courses[i].getCourseCode());
+            }
+        }
+    }
 }

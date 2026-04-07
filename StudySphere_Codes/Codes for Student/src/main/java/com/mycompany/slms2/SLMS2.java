@@ -12,5 +12,6 @@ public class SLMS2 {
 
     public static void main(String[] args) {
         StudentManager.main(args);
+
     }
 }
