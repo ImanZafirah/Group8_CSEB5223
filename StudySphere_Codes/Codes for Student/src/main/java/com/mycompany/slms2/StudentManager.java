@@ -5,31 +5,35 @@ import java.util.Scanner;
 public class StudentManager {
 
     static Student[] student = new Student[100];
-    int[][] enrollment;
-    enrollment = new int[100][100];
     static int count = 0;
+
+    int[][] enrollment = new int[100][100];
 
     String[] cachedStudentSearch = new String[50];
     int studentCacheIndex = 0;
 
-    //Student cache
-    void cacheStudentSearch(String studentId){
+    // ===================== CACHE SYSTEM =====================
+
+    void cacheStudentSearch(String studentId) {
         cachedStudentSearch[studentCacheIndex] = studentId;
         studentCacheIndex++;
-    if(studentCacheIndex >= cachedStudentSearch.length){
-        studentCacheIndex = 0;
+
+        if (studentCacheIndex >= cachedStudentSearch.length) {
+            studentCacheIndex = 0;
+        }
     }
 
-    //Auto suggestion for student
-    public void suggestStudent(String input){
+    public void suggestStudent(String input) {
         System.out.println("Suggestions:");
-        for(String s : cachedStudentSearch){
-            if(s != null && s.startsWith(input)){
+
+        for (String s : cachedStudentSearch) {
+            if (s != null && s.startsWith(input)) {
                 System.out.println(" - " + s);
             }
         }
     }
-}
+
+    // ===================== MAIN MENU =====================
 
     public static void main(String[] args) {
 
@@ -51,32 +55,13 @@ public class StudentManager {
 
             switch (choice) {
 
-                case 1:
-                    addStudent(scanner);
-                    break;
-
-                case 2:
-                    searchStudent(scanner);
-                    break;
-
-                case 3:
-                    editStudent(scanner);
-                    break;
-
-                case 4:
-                    deleteStudent(scanner);
-                    break;
-
-                case 5:
-                    displayStudent();
-                    break;
-
-                case 6:
-                    System.out.println("Exiting...");
-                    break;
-
-                default:
-                    System.out.println("Invalid choice.");
+                case 1 -> addStudent(scanner);
+                case 2 -> searchStudent(scanner);
+                case 3 -> editStudent(scanner);
+                case 4 -> deleteStudent(scanner);
+                case 5 -> displayStudent();
+                case 6 -> System.out.println("Exiting...");
+                default -> System.out.println("Invalid choice.");
             }
 
         } while (choice != 6);
@@ -84,39 +69,37 @@ public class StudentManager {
         scanner.close();
     }
 
+    // ===================== ADD STUDENT =====================
+
     public static void addStudent(Scanner scanner) {
 
         if (count >= student.length) {
             System.out.println("Student list is full!");
             return;
         }
-        
-        // Declare variables outside the loops so they can be used later
+
         String firstName, lastName, studentPhone;
 
         while (true) {
             System.out.print("Student First Name: ");
             firstName = scanner.nextLine();
-            if (firstName.matches("[a-zA-Z ]+")) {
-                break; // Valid input, exit the while loop
-            }
-            System.out.println("Invalid format! Please use alphabets only.");
+            if (firstName.matches("[a-zA-Z ]+")) break;
+            System.out.println("Invalid format! Alphabets only.");
         }
-        
+
         while (true) {
             System.out.print("Student Last Name: ");
             lastName = scanner.nextLine();
-            if (lastName.matches("[a-zA-Z ]+")) {
-                break; // Valid input, exit the while loop
-            }
-            System.out.println("Invalid format! Please use alphabets only.");
+            if (lastName.matches("[a-zA-Z ]+")) break;
+            System.out.println("Invalid format! Alphabets only.");
         }
 
         System.out.print("Student ID: ");
         String studentId = scanner.nextLine();
 
         for (int i = 0; i < count; i++) {
-            if (student[i].getStudentId().equalsIgnoreCase(studentId)) {
+            if (student[i] != null &&
+                student[i].getStudentId().equalsIgnoreCase(studentId)) {
                 System.out.println("Error: Student already exists!");
                 return;
             }
@@ -125,13 +108,11 @@ public class StudentManager {
         System.out.print("Student Email: ");
         String studentEmail = scanner.nextLine();
 
-        while (true){
+        while (true) {
             System.out.print("Student Phone Number: ");
             studentPhone = scanner.nextLine();
-            if (studentPhone.matches("[0-9]+")) {
-                break;
-            }
-            System.out.println("Invalid phone number! Phone number must contain only digits.");
+            if (studentPhone.matches("[0-9]+")) break;
+            System.out.println("Invalid phone number!");
         }
 
         student[count] = new Student(firstName, lastName, studentId, studentEmail, studentPhone);
@@ -140,15 +121,7 @@ public class StudentManager {
         System.out.println("Student added successfully!");
     }
 
-    public void addStudent(int courseIndex, int studentIndex) {
-
-        if (enrollment[studentIndex][courseIndex] == 1) {
-            System.out.println("Already assigned");
-            return;
-        }
-
-        enrollment[studentIndex][courseIndex] = 1;
-    }
+    // ===================== SEARCH STUDENT =====================
 
     public static void searchStudent(Scanner scanner) {
 
@@ -162,154 +135,16 @@ public class StudentManager {
 
         for (int i = 0; i < count; i++) {
 
-            if (student[i].getStudentId().equalsIgnoreCase(searchStudentId)) {
+            if (student[i] != null &&
+                student[i].getStudentId().equalsIgnoreCase(searchStudentId)) {
 
-                StudentManager manager = new StudentManager();
                 manager.cacheStudentSearch(searchStudentId);
 
                 System.out.println("\n===== STUDENT FOUND =====");
-                System.out.println("Student Name          : " + student[i].getFirstName() + " " + student[i].getLastName());
-                System.out.println("Student ID            : " + student[i].getStudentId());
-                System.out.println("Student Email         : " + student[i].getStudentEmail());
-                System.out.println("Student Phone Number  : " + student[i].getStudentPhone());
-
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            System.out.println("Error: Student not found.");
-            displayStudent();
-        }
-    }
-
-    void findStudent(int courseIndex){
-
-        for(int i=0;i<student.length;i++){
-            if(enrollment[i][courseIndex] == 1){
-                System.out.println(student[i].getFirstName() + " " + student[i].getLastName());
-            }
-        }
-    }
-
-    public static void editStudent(Scanner scanner) {
-
-    System.out.print("Enter student ID to edit: ");
-    String searchStudentId = scanner.nextLine();
-
-    boolean found = false;
-
-    for (int i = 0; i < count; i++) {
-        if (student[i].getStudentId().equalsIgnoreCase(searchStudentId)) {
-
-            System.out.println("\n===== STUDENT FOUND =====");
-            System.out.println("Student Name          : " + student[i].getFirstName() + " " + student[i].getLastName());
-            System.out.println("Student ID            : " + student[i].getStudentId());
-            System.out.println("Student Email         : " + student[i].getStudentEmail());
-            System.out.println("Student Phone Number  : " + student[i].getStudentPhone());
-
-            System.out.println("\nEnter new values (leave blank to keep current)");
-
-            while (true) {
-                System.out.print("New Student First Name: ");
-                String firstName = scanner.nextLine();
-                if (firstName.isEmpty()) {
-                    break; 
-                }
-                
-                //Validates that input contains only alphabets and spaces
-                if (firstName.matches("[a-zA-Z ]+")) {
-                    student[i].setFirstName(firstName);
-                    break;
-                }
-                System.out.println("Invalid format! Use alphabets only.");
-            }
-            
-            while (true){
-                System.out.print("New Student Last Name: ");
-                String lastName = scanner.nextLine();
-                if (lastName.isEmpty()) {
-                    break;
-                }
-                
-                // Validates that input contains only alphabets and spaces
-                if (lastName.matches("[a-zA-Z ]+")) {
-                    student[i].setLastName(lastName);
-                    break;
-                }
-                System.out.println("Invalid format! Use alphabets only.");
-            }
-
-            System.out.print("New Student Email: ");
-            String studentEmail = scanner.nextLine();
-            if (!studentEmail.isEmpty()) {
-                student[i].setStudentEmail(studentEmail);
-            }
-
-            while (true){
-                System.out.print("New Student Phone Number: ");
-                String studentPhone = scanner.nextLine();
-                if (studentPhone.isEmpty()) {
-                    break;
-                }
-                
-                //Check if the input contains only numbers
-                if (studentPhone.matches("[0-9]+")) {
-                    student[i].setStudentPhone(studentPhone);
-                    break;
-                }
-                System.out.println("Invalid format! Phone number must contain only digits.");
-            }
-
-            System.out.println("\n===== STUDENT UPDATED =====");
-            System.out.println("Student Name          : " + student[i].getFirstName() + " " + student[i].getLastName());
-            System.out.println("Student ID            : " + student[i].getStudentId());
-            System.out.println("Student Email         : " + student[i].getStudentEmail());
-            System.out.println("Student Phone Number  : " + student[i].getStudentPhone());
-
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        System.out.println("Student not found.");
-    }
-}
-
-    public static void deleteStudent(Scanner scanner) {
-
-        System.out.print("Enter Student ID to delete: ");
-        String studentId = scanner.nextLine();
-
-        boolean found = false;
-
-        for (int i = 0; i < count; i++) {
-
-            if (student[i].getStudentId().equalsIgnoreCase(studentId)) {
-
-                System.out.println("\nStudent Found:");
-                System.out.println("Student Name          : " + student[i].getFirstName() + " " + student[i].getLastName());
-                System.out.println("Student ID            : " + student[i].getStudentId());
-                System.out.println("Student Email         : " + student[i].getStudentEmail());
-                System.out.println("Student Phone Number  : " + student[i].getStudentPhone());
-
-                System.out.print("\nConfirm deletion? (Y/N): ");
-                String confirm = scanner.nextLine();
-
-                if (confirm.equalsIgnoreCase("Y")) {
-
-                    for (int j = i; j < count - 1; j++) {
-                        student[j] = student[j + 1];
-                    }
-
-                    student[count - 1] = null;
-                    count--;
-
-                    System.out.println("Student deleted successfully!");
-                    displayStudent();
-                }
+                System.out.println("Name   : " + student[i].getFirstName() + " " + student[i].getLastName());
+                System.out.println("ID     : " + student[i].getStudentId());
+                System.out.println("Email  : " + student[i].getStudentEmail());
+                System.out.println("Phone  : " + student[i].getStudentPhone());
 
                 found = true;
                 break;
@@ -321,39 +156,144 @@ public class StudentManager {
         }
     }
 
+    // ===================== EDIT STUDENT =====================
+
+    public static void editStudent(Scanner scanner) {
+
+        System.out.print("Enter student ID to edit: ");
+        String id = scanner.nextLine();
+
+        for (int i = 0; i < count; i++) {
+
+            if (student[i] != null &&
+                student[i].getStudentId().equalsIgnoreCase(id)) {
+
+                System.out.println("Student found.");
+
+                System.out.print("New First Name (enter to skip): ");
+                String firstName = scanner.nextLine();
+                if (!firstName.isEmpty() && firstName.matches("[a-zA-Z ]+")) {
+                    student[i].setFirstName(firstName);
+                }
+
+                System.out.print("New Last Name (enter to skip): ");
+                String lastName = scanner.nextLine();
+                if (!lastName.isEmpty() && lastName.matches("[a-zA-Z ]+")) {
+                    student[i].setLastName(lastName);
+                }
+
+                System.out.print("New Email (enter to skip): ");
+                String email = scanner.nextLine();
+                if (!email.isEmpty()) {
+                    student[i].setStudentEmail(email);
+                }
+
+                System.out.print("New Phone (enter to skip): ");
+                String phone = scanner.nextLine();
+                if (!phone.isEmpty() && phone.matches("[0-9]+")) {
+                    student[i].setStudentPhone(phone);
+                }
+
+                System.out.println("Student updated successfully!");
+                return;
+            }
+        }
+
+        System.out.println("Student not found.");
+    }
+
+    // ===================== DELETE STUDENT =====================
+
+    public static void deleteStudent(Scanner scanner) {
+
+        System.out.print("Enter Student ID to delete: ");
+        String id = scanner.nextLine();
+
+        for (int i = 0; i < count; i++) {
+
+            if (student[i] != null &&
+                student[i].getStudentId().equalsIgnoreCase(id)) {
+
+                System.out.print("Confirm delete? (Y/N): ");
+                String confirm = scanner.nextLine();
+
+                if (confirm.equalsIgnoreCase("Y")) {
+
+                    for (int j = i; j < count - 1; j++) {
+                        student[j] = student[j + 1];
+                    }
+
+                    student[count - 1] = null;
+                    count--;
+
+                    System.out.println("Deleted successfully!");
+                }
+
+                return;
+            }
+        }
+
+        System.out.println("Student not found.");
+    }
+
+    // ===================== DISPLAY =====================
+
     public static void displayStudent() {
 
-    if (count == 0) {
-        System.out.println("No student available.");
-        return;
+        if (count == 0) {
+            System.out.println("No students available.");
+            return;
+        }
+
+        System.out.println("\n===== STUDENT LIST =====");
+
+        for (int i = 0; i < count; i++) {
+
+            if (student[i] != null) {
+                System.out.println("\nStudent " + (i + 1));
+                System.out.println("Name  : " + student[i].getFirstName() + " " + student[i].getLastName());
+                System.out.println("ID    : " + student[i].getStudentId());
+                System.out.println("Email : " + student[i].getStudentEmail());
+                System.out.println("Phone : " + student[i].getStudentPhone());
+            }
+        }
     }
 
-    System.out.println("\n===== STUDENT LIST =====");
+    // ===================== COURSE METHODS =====================
 
-    for (int i = 0; i < count; i++) {
+    public void addStudent(int courseIndex, int studentIndex) {
 
-        System.out.println("\nStudent " + (i + 1));
-        System.out.println("Student Name          : " + student[i].getFirstName() + " " + student[i].getLastName());
-        System.out.println("Student ID            : " + student[i].getStudentId());
-        System.out.println("Student Email         : " + student[i].getStudentEmail());
-        System.out.println("Student Phone Number  : " + student[i].getStudentPhone());
+        if (enrollment[studentIndex][courseIndex] == 1) {
+            System.out.println("Already assigned");
+            return;
+        }
+
+        enrollment[studentIndex][courseIndex] = 1;
     }
-}
 
-void listStudents(int courseIndex){
+    void findStudent(int courseIndex) {
+
+        for (int i = 0; i < count; i++) {
+            if (enrollment[i][courseIndex] == 1 && student[i] != null) {
+                System.out.println(student[i].getFirstName() + " " + student[i].getLastName());
+            }
+        }
+    }
+
+    void listStudents(int courseIndex) {
 
         System.out.println("Students in course:");
 
         boolean hasStudent = false;
 
-        for(int i=0;i<count;i++){
-            if(enrollment[i][courseIndex] == 1){
+        for (int i = 0; i < count; i++) {
+            if (enrollment[i][courseIndex] == 1 && student[i] != null) {
                 System.out.println(student[i].getStudentId());
                 hasStudent = true;
             }
         }
 
-        if(!hasStudent){
+        if (!hasStudent) {
             System.out.println("No students assigned to this course.");
         }
     }
