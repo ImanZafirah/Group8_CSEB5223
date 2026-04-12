@@ -4,6 +4,9 @@ import java.util.Scanner;
 
 public class CourseManager {
 
+    public CourseManager() {
+    enrollment = new int[100][100];
+    }
     static Course[] courses = new Course[100];
     int[][] enrollment;
     static int count = 0;
@@ -90,6 +93,12 @@ public class CourseManager {
 
         System.out.print("Course Code: ");
         String code = scanner.nextLine();
+        for (int i = 0; i < count; i++) {
+            if (courses[i].getCourseCode().equalsIgnoreCase(code)) {
+                System.out.println("Error: Course already exists!");
+            return;
+            }
+        }
 
         System.out.print("Credit Hour: ");
         int credit = scanner.nextInt();
@@ -144,7 +153,7 @@ public class CourseManager {
         }
 
         if (!found) {
-            System.out.println("Course not found.");
+            System.out.println("Error: Course not found.");
             displayCourses();
         }
     }
@@ -162,12 +171,17 @@ public class CourseManager {
 
     System.out.print("Enter Course Code to edit: ");
     String searchCode = scanner.nextLine();
+    CourseManager manager = new CourseManager();
+    manager.suggestCourse(searchCode);
 
     boolean found = false;
 
     for (int i = 0; i < count; i++) {
         if (courses[i].getCourseCode().equalsIgnoreCase(searchCode)) {
 
+            CourseManager manager = new CourseManager();
+            manager.cacheCourseSearch(searchCode);
+            
             System.out.println("\n===== COURSE FOUND =====");
             System.out.println("Course Name    : " + courses[i].getCourseName());
             System.out.println("Credit Hour    : " + courses[i].getCreditHour());
@@ -288,16 +302,31 @@ public class CourseManager {
         System.out.println("MS Teams Link : " + courses[i].getTeamsLink());
         System.out.println("Course Type : " + courses[i].getCourseType());
     }
+        void suggestCourse(String input){
+            System.out.println("Suggestions:");
+            for(String c : cachedCourseSearch){
+                if(c != null && c.startsWith(input)){
+                    System.out.println(" - " + c);
+                }
+            }
+        }
 }
 
 void listCourses(int studentIndex){
 
         System.out.println("Courses enrolled:");
 
-        for(int i=0;i<courses.length;i++){
+        boolean hasCourse = false;
+
+        for(int i=0;i<count;i++){
             if(enrollment[studentIndex][i] == 1){
                 System.out.println(courses[i].getCourseCode());
+                hasCourse = true;
             }
+        }
+        
+        if(!hasCourse){
+            System.out.println("This student has no enrolled courses.");
         }
     }
 }
