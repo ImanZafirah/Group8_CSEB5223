@@ -6,6 +6,7 @@ public class StudentManager {
 
     static Student[] student = new Student[100];
     int[][] enrollment;
+    enrollment = new int[100][100];
     static int count = 0;
 
     String[] cachedStudentSearch = new String[50];
@@ -13,21 +14,21 @@ public class StudentManager {
 
     //Student cache
     void cacheStudentSearch(String studentId){
-    cachedStudentSearch[studentCacheIndex] = studentId;
-    studentCacheIndex++;
+        cachedStudentSearch[studentCacheIndex] = studentId;
+        studentCacheIndex++;
     if(studentCacheIndex >= cachedStudentSearch.length){
         studentCacheIndex = 0;
     }
 
     //Auto suggestion for student
-    /*public void suggestStudent(String input){
+    public void suggestStudent(String input){
         System.out.println("Suggestions:");
         for(String s : cachedStudentSearch){
             if(s != null && s.startsWith(input)){
                 System.out.println(" - " + s);
             }
         }
-    }*/
+    }
 }
 
     public static void main(String[] args) {
@@ -114,6 +115,13 @@ public class StudentManager {
         System.out.print("Student ID: ");
         String studentId = scanner.nextLine();
 
+        for (int i = 0; i < count; i++) {
+            if (student[i].getStudentId().equalsIgnoreCase(studentId)) {
+                System.out.println("Error: Student already exists!");
+                return;
+            }
+        }
+
         System.out.print("Student Email: ");
         String studentEmail = scanner.nextLine();
 
@@ -147,11 +155,17 @@ public class StudentManager {
         System.out.print("Enter Student ID to search: ");
         String searchStudentId = scanner.nextLine();
 
+        StudentManager manager = new StudentManager();
+        manager.suggestStudent(searchStudentId);
+
         boolean found = false;
 
         for (int i = 0; i < count; i++) {
 
             if (student[i].getStudentId().equalsIgnoreCase(searchStudentId)) {
+
+                StudentManager manager = new StudentManager();
+                manager.cacheStudentSearch(searchStudentId);
 
                 System.out.println("\n===== STUDENT FOUND =====");
                 System.out.println("Student Name          : " + student[i].getFirstName() + " " + student[i].getLastName());
@@ -165,7 +179,7 @@ public class StudentManager {
         }
 
         if (!found) {
-            System.out.println("Student not found.");
+            System.out.println("Error: Student not found.");
             displayStudent();
         }
     }
@@ -330,10 +344,17 @@ void listStudents(int courseIndex){
 
         System.out.println("Students in course:");
 
-        for(int i=0;i<student.length;i++){
+        boolean hasStudent = false;
+
+        for(int i=0;i<count;i++){
             if(enrollment[i][courseIndex] == 1){
                 System.out.println(student[i].getStudentId());
+                hasStudent = true;
             }
+        }
+
+        if(!hasStudent){
+            System.out.println("No students assigned to this course.");
         }
     }
 }
