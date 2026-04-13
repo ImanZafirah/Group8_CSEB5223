@@ -333,19 +333,19 @@ public class StudentManager {
 
     void listStudents(int courseIndex) {
 
-        System.out.println("Students in course:");
+        System.out.println("\nStudents in this course:");
 
         boolean hasStudent = false;
 
         for (int i = 0; i < count; i++) {
             if (enrollment[i][courseIndex] == 1 && student[i] != null) {
-                System.out.println(student[i].getStudentId());
+                System.out.println("- " + student[i].getStudentId());
                 hasStudent = true;
             }
         }
 
         if (!hasStudent) {
-            System.out.println("No students assigned to this course.");
+            System.out.println("\nNo students assigned to this course.");
         }
     }
     
