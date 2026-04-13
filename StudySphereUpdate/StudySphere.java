@@ -12,14 +12,14 @@ public class StudySphere {
         
         int mainChoice = 0;
 
-        // Changed to 4 so we can include the Enrollment module
+        // Changed to 4 to include the Enrollment module
         while (mainChoice != 4) {
             System.out.println("\n==================================");
-            System.out.println("   WELCOME TO STUDY SPHERE SLMS   ");
+            System.out.println("   WELCOME TO STUDYSPHERE SLMS   ");
             System.out.println("==================================");
             System.out.println("1. Manage Course Profiles");
             System.out.println("2. Manage Student Profiles");
-            System.out.println("3. Manage Enrollments (Relationships)");
+            System.out.println("3. Manage Enrollments");
             System.out.println("4. Exit System");
             System.out.print("Please select a module: ");
 
@@ -54,7 +54,7 @@ public class StudySphere {
     // New helper method to keep the main menu clean
     private static void handleEnrollmentMenu(Scanner sc, CourseManager cm, StudentManager sm) {
     int sub = 0;
-    // The loop keeps you inside the Enrollment menu
+    // The loop inside the Enrollment menu
     do {
         if (StudentManager.count == 0 || CourseManager.count == 0) {
             System.out.println("\n[!] Error: System requires at least one Student and one Course.");
