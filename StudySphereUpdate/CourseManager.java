@@ -175,6 +175,7 @@ public class CourseManager {
                 System.out.println("Credit Hour    : " + courses[i].getCreditHour());
                 System.out.println("Summary        : " + courses[i].getSummary());
                 System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+                System.out.println("Type           : " + courses[i].getCourseType());
 
                 System.out.println("\nEnter new values (leave blank to keep current)");
 
@@ -206,6 +207,12 @@ public class CourseManager {
                 if (!link.isEmpty()) {
                     courses[i].setTeamsLink(link);
                 }
+                
+                System.out.print("New Course Type: ");
+                String type = scanner.nextLine();
+                if (!type.isEmpty()) {
+                courses[i].setCourseType(type);
+                }
 
                 System.out.println("\n===== COURSE UPDATED =====");
                 System.out.println("Course Name    : " + courses[i].getCourseName());
@@ -213,6 +220,7 @@ public class CourseManager {
                 System.out.println("Credit Hour    : " + courses[i].getCreditHour());
                 System.out.println("Summary        : " + courses[i].getSummary());
                 System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+                System.out.println("Type           : " + courses[i].getCourseType());
 
                 found = true;
                 break;
@@ -244,6 +252,7 @@ public class CourseManager {
             System.out.println("Credit Hour    : " + courses[i].getCreditHour());
             System.out.println("Summary        : " + courses[i].getSummary());
             System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+            System.out.println("Type           : " + courses[i].getCourseType());
 
             System.out.print("\nConfirm deletion? (Y/N): ");
             String confirm = scanner.nextLine();
@@ -340,7 +349,7 @@ public class CourseManager {
     }
 
     boolean hasCourse = false;
-    System.out.println("Courses enrolled for " + studentId + ":");
+    System.out.println("\nCourses enrolled for " + studentId + ":");
     for (int i = 0; i < count; i++) {
         // Requirement 2d logic
         if (enrollment[sIdx][i] == 1 && courses[i] != null) {
@@ -350,7 +359,7 @@ public class CourseManager {
     }
     
     // Requirement 3a: Check for student without an assigned course
-    if (!hasCourse) System.out.println("No courses enrolled.");
+    if (!hasCourse) System.out.println("\nNo courses enrolled.");
 }
     
     public static int getCourseIndexByCode(String code) {
