@@ -9,87 +9,86 @@ public class CourseManager {
 
     int[][] enrollment = new int[100][100];
 
-    String[] cachedCourseSearch = new String[50];
-    int courseCacheIndex = 0;
+    // Persists across different method calls
+    static String[] cachedCourseSearch = new String[50];
+    static int courseCacheIndex = 0;
 
-    // ================= CACHE =================
+    // ================= CACHE SYSTEM =================
 
-    void cacheCourseSearch(String courseCode) {
-        cachedCourseSearch[courseCacheIndex] = courseCode;
-        courseCacheIndex++;
-
-        if (courseCacheIndex >= cachedCourseSearch.length) {
-            courseCacheIndex = 0;
+    static void cacheCourseSearch(String courseCode) {
+        // Prevent duplicate suggestions in the list
+        for (String c : cachedCourseSearch) {
+            if (c != null && c.equalsIgnoreCase(courseCode)) return;
         }
+        
+        cachedCourseSearch[courseCacheIndex] = courseCode.toUpperCase();
+        courseCacheIndex = (courseCacheIndex + 1) % cachedCourseSearch.length;
     }
 
-    public void suggestCourse(String input) {
-        System.out.println("Suggestions:");
-
+    public static void suggestCourse(String input) {
+        if (input.isEmpty()) return;
+        
+        System.out.println("\n[System Suggestions]:");
+        boolean found = false;
         for (String c : cachedCourseSearch) {
-            if (c != null && c.startsWith(input)) {
+            if (c != null && c.startsWith(input.toUpperCase())) {
                 System.out.println(" - " + c);
+                found = true;
             }
         }
+        if (!found) System.out.println(" > No matching registered courses.");
     }
 
-    // ================= MAIN =================
+    // ================= MAIN MENU =================
 
     public void displayCourseMenu(Scanner scanner) {
-    int choice = 0;
+        int choice = 0;
+        do {
+            System.out.println("\n==== COURSE PROFILE SYSTEM ====");
+            System.out.println("1. Add Course");
+            System.out.println("2. Search Course");
+            System.out.println("3. Edit Course");
+            System.out.println("4. Delete Course");
+            System.out.println("5. View All Course");
+            System.out.println("6. Exit");
+            System.out.print("Choose option: ");
 
-    do {
-        System.out.println("\n==== COURSE PROFILE SYSTEM ====");
-        System.out.println("1. Add Course");
-        System.out.println("2. Search Course");
-        System.out.println("3. Edit Course");
-        System.out.println("4. Delete Course");
-        System.out.println("5. View All Course");
-        System.out.println("6. Exit");
-        System.out.print("Choose option: ");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine(); 
 
-        // Check if the user entered a number
-        if (scanner.hasNextInt()) {
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
-
-            switch (choice) {
-                case 1 -> addCourse(scanner);
-                case 2 -> searchCourse(scanner);
-                case 3 -> editCourse(scanner);
-                case 4 -> deleteCourse(scanner);
-                case 5 -> displayCourses();
-                case 6 -> System.out.println("Exiting Course Module...");
-                default -> System.out.println("Invalid choice. Please enter 1-6.");
+                switch (choice) {
+                    case 1 -> addCourse(scanner);
+                    case 2 -> searchCourse(scanner);
+                    case 3 -> editCourse(scanner);
+                    case 4 -> deleteCourse(scanner);
+                    case 5 -> displayCourses();
+                    case 6 -> System.out.println("Exiting Course Module...");
+                    default -> System.out.println("\nInvalid choice. Please enter 1-6.");
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a number (1-6).");
+                scanner.nextLine(); 
+                choice = 0; 
             }
-        } else {
-            // This runs if the user enters an alphabet or symbol
-            System.out.println("Invalid input! Please enter a number (1-6).");
-            scanner.nextLine(); // CRITICAL: This clears the alphabet from the scanner
-            choice = 0; // Set choice to 0 so the loop continues
-        }
+        } while (choice != 6);
+    }
 
-    } while (choice != 6);
-}
-
-    // ================= ADD =================
-
+    // ================= ADD COURSE =================
     public static void addCourse(Scanner scanner) {
-
         if (count >= courses.length) {
             System.out.println("Course list full!");
             return;
         }
 
-        System.out.print("Course Name: ");
+        System.out.print("\nCourse Name: ");
         String name = scanner.nextLine();
 
         System.out.print("Course Code: ");
         String code = scanner.nextLine();
 
         for (int i = 0; i < count; i++) {
-            if (courses[i] != null &&
-                courses[i].getCourseCode().equalsIgnoreCase(code)) {
+            if (courses[i] != null && courses[i].getCourseCode().equalsIgnoreCase(code)) {
                 System.out.println("Course already exists!");
                 return;
             }
@@ -109,30 +108,24 @@ public class CourseManager {
         String type = scanner.nextLine();
 
         courses[count] = new Course(name, code, credit, summary, link, type);
+        
+        // SUCCESS: Add to CACHE only when course is successfully created
+        cacheCourseSearch(code);
+        
         count++;
-
-        System.out.println("Course added successfully!");
+        System.out.println("\nCourse added successfully!");
     }
 
-    // ================= SEARCH =================
-
+    // ================= SEARCH COURSE =================
     public static void searchCourse(Scanner scanner) {
+    boolean found = false;
 
-        System.out.print("Enter Course Code: ");
-        String code = scanner.nextLine();
-
-        CourseManager manager = new CourseManager();
-        manager.suggestCourse(code);
-
-        boolean found = false;
+    while (!found) {
+        System.out.print("\nEnter Course Code to search: ");
+        String searchCode = scanner.nextLine();
 
         for (int i = 0; i < count; i++) {
-
-            if (courses[i] != null &&
-                courses[i].getCourseCode().equalsIgnoreCase(code)) {
-
-                manager.cacheCourseSearch(code);
-
+            if (courses[i] != null && courses[i].getCourseCode().equalsIgnoreCase(searchCode)) {
                 System.out.println("\n===== COURSE FOUND =====");
                 System.out.println("Name   : " + courses[i].getCourseName());
                 System.out.println("Code   : " + courses[i].getCourseCode());
@@ -140,157 +133,159 @@ public class CourseManager {
                 System.out.println("Summary: " + courses[i].getSummary());
                 System.out.println("Link   : " + courses[i].getTeamsLink());
                 System.out.println("Type   : " + courses[i].getCourseType());
-
+                
                 found = true;
                 break;
             }
         }
 
         if (!found) {
-            System.out.println("Course not found.");
-            displayCourses();
+            System.out.println("\n[!] Course not found.");
+            suggestCourse(searchCode);
+            System.out.println("Please try again.");
         }
     }
+}
 
     // ================= EDIT =================
-
     public static void editCourse(Scanner scanner) {
-
-        System.out.print("Enter Course Code to edit: ");
-        String searchCode = scanner.nextLine();
-
-        CourseManager manager = new CourseManager();
-        manager.suggestCourse(searchCode);
+        if (count == 0) {
+            System.out.println("\n[!] No courses registered in the system.");
+            return;
+        }
 
         boolean found = false;
+        int i = -1; // To store the index once found
 
-        for (int i = 0; i < count; i++) {
-            if (courses[i] != null && courses[i].getCourseCode().equalsIgnoreCase(searchCode)) {
-            
-                //Cache logic
-                manager.cacheCourseSearch(searchCode);
+        // LOOP starts here
+        while (!found) {
+            System.out.print("Enter Course Code to edit: ");
+            String searchCode = scanner.nextLine();
 
-                System.out.println("\n===== COURSE FOUND =====");
-                System.out.println("Course Name    : " + courses[i].getCourseName());
-                System.out.println("Credit Hour    : " + courses[i].getCreditHour());
-                System.out.println("Summary        : " + courses[i].getSummary());
-                System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
-                System.out.println("Type           : " + courses[i].getCourseType());
-
-                System.out.println("\nEnter new values (leave blank to keep current)");
-
-                System.out.print("New Course Name: ");
-                String name = scanner.nextLine();
-                if (!name.isEmpty()) {
-                    courses[i].setCourseName(name);
+            for (int j = 0; j < count; j++) {
+                if (courses[j] != null && courses[j].getCourseCode().equalsIgnoreCase(searchCode)) {
+                    i = j; // Found the student at this index
+                    found = true;
+                    break;
                 }
+            }
 
-                System.out.print("New Credit Hour: ");
-                String creditInput = scanner.nextLine();
-                if (!creditInput.isEmpty()) {
-                    try {
-                        int credit = Integer.parseInt(creditInput);
-                        courses[i].setCreditHour(credit);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid credit hour, keeping previous value.");
-                    }
-                }
-
-                System.out.print("New Summary: ");
-                String summary = scanner.nextLine();
-                if (!summary.isEmpty()) {
-                    courses[i].setSummary(summary);
-                }
-
-                System.out.print("New MS Teams Link: ");
-                String link = scanner.nextLine();
-                if (!link.isEmpty()) {
-                    courses[i].setTeamsLink(link);
-                }
-                
-                System.out.print("New Course Type: ");
-                String type = scanner.nextLine();
-                if (!type.isEmpty()) {
-                courses[i].setCourseType(type);
-                }
-
-                System.out.println("\n===== COURSE UPDATED =====");
-                System.out.println("Course Name    : " + courses[i].getCourseName());
-                System.out.println("Course Code    : " + courses[i].getCourseCode());
-                System.out.println("Credit Hour    : " + courses[i].getCreditHour());
-                System.out.println("Summary        : " + courses[i].getSummary());
-                System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
-                System.out.println("Type           : " + courses[i].getCourseType());
-
-                found = true;
-                break;
+            if (!found) {
+                System.out.println("\nCourse not found.");
+                suggestCourse(searchCode); // Suggest based on current input
+                System.out.println("Please key in the correct Course Code.");
             }
         }
 
-        if (!found) {
-            System.out.println("Course not found.");
+        cacheCourseSearch(courses[i].getCourseCode());
+
+        System.out.println("\n===== COURSE FOUND =====");
+        System.out.println("Course Name    : " + courses[i].getCourseName());
+        System.out.println("Credit Hour    : " + courses[i].getCreditHour());
+        System.out.println("Summary        : " + courses[i].getSummary());
+        System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+        System.out.println("Type           : " + courses[i].getCourseType());
+
+        System.out.println("\nEnter new values (leave blank to keep current)");
+
+        System.out.print("New Course Name: ");
+        String name = scanner.nextLine();
+        if (!name.isEmpty()) courses[i].setCourseName(name);
+
+        System.out.print("New Credit Hour: ");
+        String creditInput = scanner.nextLine();
+        if (!creditInput.isEmpty()) {
+            try {
+                courses[i].setCreditHour(Integer.parseInt(creditInput));
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid format, keeping previous.");
+            }
         }
+
+        System.out.print("New Summary: ");
+        String summary = scanner.nextLine();
+        if (!summary.isEmpty()) courses[i].setSummary(summary);
+
+        System.out.print("New MS Teams Link: ");
+        String link = scanner.nextLine();
+        if (!link.isEmpty()) courses[i].setTeamsLink(link);
+        
+        System.out.print("New Course Type: ");
+        String type = scanner.nextLine();
+        if (!type.isEmpty()) courses[i].setCourseType(type);
+
+        System.out.println("\n===== COURSE UPDATED =====");
+        System.out.println("Course Name    : " + courses[i].getCourseName());
+        System.out.println("Course Code    : " + courses[i].getCourseCode());
+        System.out.println("Credit Hour    : " + courses[i].getCreditHour());
+        System.out.println("Summary        : " + courses[i].getSummary());
+        System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+        System.out.println("Type           : " + courses[i].getCourseType());
+
         displayCourses();
     }
 
     // ================= DELETE =================
-
     public static void deleteCourse(Scanner scanner) {
-
-    System.out.print("Enter Course Code to delete: ");
-    String code = scanner.nextLine();
-
-    boolean found = false;
-
-    for (int i = 0; i < count; i++) {
-        // null check added for safety
-        if (courses[i] != null && courses[i].getCourseCode().equalsIgnoreCase(code)) {
-
-            System.out.println("\nCourse Found:");
-            System.out.println("Course Name    : " + courses[i].getCourseName());
-            System.out.println("Course Code    : " + courses[i].getCourseCode());
-            System.out.println("Credit Hour    : " + courses[i].getCreditHour());
-            System.out.println("Summary        : " + courses[i].getSummary());
-            System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
-            System.out.println("Type           : " + courses[i].getCourseType());
-
-            System.out.print("\nConfirm deletion? (Y/N): ");
-            String confirm = scanner.nextLine();
-
-            if (confirm.equalsIgnoreCase("Y")) {
-                // Array shifting logic to remove the item
-                for (int j = i; j < count - 1; j++) {
-                    courses[j] = courses[j + 1];
-                }
-
-                courses[count - 1] = null;
-                count--;
-
-                System.out.println("Course deleted successfully!");
-            }
-
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        System.out.println("Course not found.");
-    }
-    displayCourses();
-}
-
-    // ================= DISPLAY =================
-
-    public static void displayCourses() {
-
         if (count == 0) {
-            System.out.println("No courses available.");
+            System.out.println("\n[!] No courses registered to delete.");
             return;
         }
 
-        for (int i = 0; i < count; i++) {
+        boolean found = false;
+        int i = -1;
 
+        while (!found) {
+            System.out.print("Enter Course Code to delete: ");
+            String code = scanner.nextLine();
+
+            for (int j = 0; j < count; j++) {
+                if (courses[j] != null && courses[j].getCourseCode().equalsIgnoreCase(code)) {
+                    i = j;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                System.out.println("\nCourse not found.");
+                suggestCourse(code);
+                System.out.println("Please key in the correct Course Code.");
+            }
+        }
+        
+        //Original detail display before confirmation
+        System.out.println("\n===== COURSE FOUND =====");
+        System.out.println("Course Name    : " + courses[i].getCourseName());
+        System.out.println("Course Code    : " + courses[i].getCourseCode());
+        System.out.println("Credit Hour    : " + courses[i].getCreditHour());
+        System.out.println("Summary        : " + courses[i].getSummary());
+        System.out.println("MS Teams Link  : " + courses[i].getTeamsLink());
+        System.out.println("Type           : " + courses[i].getCourseType());
+
+        System.out.print("\nConfirm deletion? (Y/N): ");
+        String confirm = scanner.nextLine();
+
+        if (confirm.equalsIgnoreCase("Y")) {
+            for (int k = i; k < count - 1; k++) {
+                courses[k] = courses[k + 1];
+            }
+            courses[count - 1] = null;
+            count--;
+            System.out.println("Course deleted successfully!");
+            System.out.println("--- Remaining Courses ---");
+        }
+        displayCourses();
+    }
+
+    // ================= DISPLAY =================
+    public static void displayCourses() {
+        if (count == 0) {
+            System.out.println("\nNo courses available.");
+            return;
+        }
+        System.out.println("\n===== COURSE LIST =====");
+        for (int i = 0; i < count; i++) {
             if (courses[i] != null) {
                 System.out.println("\nCourse " + (i + 1));
                 System.out.println("Name   : " + courses[i].getCourseName());
@@ -303,71 +298,36 @@ public class CourseManager {
         }
     }
 
-    // ================= ENROLLMENT =================
+    // ================= ENROLLMENT HELPERS =================
+    public boolean enrollStudentInCourse(int studentIndex, int courseIndex) {
+    // If already 1, return false
+    if (enrollment[studentIndex][courseIndex] == 1) return false;
+    
+    enrollment[studentIndex][courseIndex] = 1;
+    return true; // Successfully updated
+    }
 
-    public void enrollStudentInCourse(int studentIndex, int courseIndex) {
-
-        if (enrollment[studentIndex][courseIndex] == 1) {
-            System.out.println("Already enrolled");
+    public void listCoursesByStudentId(String studentId) {
+        int sIdx = StudentManager.getStudentIndexById(studentId);
+        if (sIdx == -1) {
+            System.out.println("\nError: Student ID not found.");
             return;
         }
-
-        enrollment[studentIndex][courseIndex] = 1;
-    }
-
-    void findCourse(int studentIndex) {
-
-        for (int i = 0; i < count; i++) {
-            if (enrollment[studentIndex][i] == 1 && courses[i] != null) {
-                System.out.println(courses[i].getCourseName());
-            }
-        }
-    }
-
-    /*void listCourses(int studentIndex) {
-
         boolean hasCourse = false;
-
-        System.out.println("Courses enrolled:");
-
+        System.out.println("\nCourses enrolled for " + studentId + ":");
         for (int i = 0; i < count; i++) {
-            if (enrollment[studentIndex][i] == 1 && courses[i] != null) {
-                System.out.println(courses[i].getCourseCode());
+            if (enrollment[sIdx][i] == 1 && courses[i] != null) {
+                System.out.println("- " + courses[i].getCourseCode() + ": " + courses[i].getCourseName());
                 hasCourse = true;
             }
         }
-
-        if (!hasCourse) {
-            System.out.println("No courses enrolled.");
-        }
-    }*/
-    public void listCoursesByStudentId(String studentId) {
-    int sIdx = StudentManager.getStudentIndexById(studentId);
-    if (sIdx == -1) {
-        System.out.println("Error: Student ID not found.");
-        return;
+        if (!hasCourse) System.out.println("\nNo courses enrolled.");
     }
-
-    boolean hasCourse = false;
-    System.out.println("\nCourses enrolled for " + studentId + ":");
-    for (int i = 0; i < count; i++) {
-        // Requirement 2d logic
-        if (enrollment[sIdx][i] == 1 && courses[i] != null) {
-            System.out.println("- " + courses[i].getCourseCode() + ": " + courses[i].getCourseName());
-            hasCourse = true;
-        }
-    }
-    
-    // Requirement 3a: Check for student without an assigned course
-    if (!hasCourse) System.out.println("\nNo courses enrolled.");
-}
     
     public static int getCourseIndexByCode(String code) {
-    for (int i = 0; i < count; i++) {
-        if (courses[i] != null && courses[i].getCourseCode().equalsIgnoreCase(code)) {
-            return i;
+        for (int i = 0; i < count; i++) {
+            if (courses[i] != null && courses[i].getCourseCode().equalsIgnoreCase(code)) return i;
         }
+        return -1;
     }
-    return -1; // Requirement 3a: Returns -1 if course not found
-}
 }
